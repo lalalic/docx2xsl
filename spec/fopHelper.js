@@ -3,7 +3,7 @@ var fopFile = "fop" + (isWin ? ".bat" : "");
 
 var childProcess = require('child_process')
 
-module.exports=function(xslFilePath){
+function fop(xslFilePath){
     var childArgs = ["-fo",xslFilePath,"-pdf",xslFilePath+".pdf"]
 
     return new Promise(function(resolve, reject){
@@ -11,8 +11,17 @@ module.exports=function(xslFilePath){
             if(error){
                 reject(error)
             } else{
-                resolve(xslFilePath)
+                resolve(xslFilePath+".pdf")
             }
         })
     })
 }
+
+fop.fromContent=function(content){
+    var fileName=`${__dirname}/temp/test.fo`
+    require("fs").writeFileSync(fileName,content,"utf8")
+
+    return fop(fileName)
+}
+
+module.exports=fop

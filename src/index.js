@@ -3,7 +3,10 @@ import docx4js from "docx4js"
 var converters={
     "*":                require("./converter/any"),
     "document":         require("./converter/document"),
-    "section":          require("./converter/simple-page-master")
+    "section":          require("./converter/simple-page-master"),
+    "paragraph":        require('./converter/block'),
+    "inline":           require("./converter/inline"),
+    "text":             require("./converter/text")
 }
 
 export default function docx2xsl(aDocx, option){
