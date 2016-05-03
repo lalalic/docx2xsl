@@ -5,7 +5,17 @@ export default class Block extends require("./any"){
 
     convertStyle(){
         super.convertStyle(...arguments)
-		var style=this.wordModel.getDirectStyle()
-		style && style.parse([new Style.Properties(this.content, this)])
+		
+		let directStyle=this.wordModel.getDirectStyle()
+			,namedStyleId=this.wordModel.getStyleId()
+			,style=null
+			
+		if(directStyle){
+			style=this.doc.createStyle(null,namedStyleId)
+			directStyle.parse([new Style.Properties(style, this)])
+		}else 
+			style=this.doc.getStyle(namedStyleId)
+		
+		style && style.applyOn(this.content)
     }
 }

@@ -1,52 +1,49 @@
 import Style from './converter'
 
 export default class Inline extends Style{
-	constructor(){
-		super(...arguments)
-		this.style=this.wordModel.id ? this.doc.createStyle('.'+Style.asCssID(this.wordModel.id)) : this.doc.createStyle('span')
-		this.inline=new this.constructor.Properties(this.style)
-	}
 	_getPropertiesConverter(){
+		if(typeof(this.inline)=='undefined')
+			this.inline=new this.constructor.Properties(this.style)
 		return this.inline
 	}
-}
-
-Inline.Properties=class Properties extends Style.Properties{
-	rFonts(x){
-		x.ascii && (this.style.fontFamily=x.ascii)
-	}
-	b(x){
-		this.style.fontWeight=700
-	}
-	sz(x){
-		this.style.fontSize=x+'pt'
-	}
-	color(x){
-		this.style.color=x
-	}
-	i(x){
-		this.style.fontStyle='italics'
-	}
-	u(x){
-		this.style.textDecoration='underline'
-	}
-	bdr(x){
-		this.style.border=this._border(x)
-	}
-	lang(x){
-		
-	}
-	vertAlign(x){
-		switch(x){
-		case 'superscript':
-			this.style.verticalAlign='super'
-		break
-		case 'subscript':
-			this.style.verticalAlign='sub'
-		break
+	
+	static Properties=class extends Style.Properties{
+		rFonts(x){
+			x.ascii && this.set("font-family",x.ascii)
 		}
-	}
-	highlight(x){
-		this.style.backgroundColor=x
+		b(x){
+			this.set("font-weight",700)
+		}
+		sz(x){
+			this.set("font-size", x+'pt')
+		}
+		color(x){
+			this.set("color",x)
+		}
+		i(x){
+			this.set("font-style",'italics')
+		}
+		u(x){
+			this.set("text-decoration",'underline')
+		}
+		bdr(x){
+			this.set("border",this._border(x))
+		}
+		lang(x){
+			
+		}
+		vertAlign(x){
+			switch(x){
+			case 'superscript':
+				this.set("vertical-align",'super')
+			break
+			case 'subscript':
+				this.set("vertical-align",'sub')
+			break
+			}
+		}
+		highlight(x){
+			this.set("background-color",x)
+		}
 	}
 }

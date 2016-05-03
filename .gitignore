@@ -33,3 +33,5 @@ cordova
 
 www/*.js
 __*.js
+
+fop

@@ -6,37 +6,37 @@ export default class Paragraph extends Style{
 	_getPropertiesConverter(category){
 		if(this[category])
 			return this[category]
+		
 		switch(category){
 		case 'inline':
-			this.inlineStyle=this.doc.createStyle('.'+Style.asCssID(this.wordModel.id)+' span')
-			return this[category]=new Inline.Properties(this.inlineStyle)
+			let inlineStyle=this.style.addCategory(category, this.doc.createStyle())
+			return this[category]=new Inline.Properties(this.style,inlineStyle)
 		case 'paragraph':
-			this.paragraphStyle=this.doc.createStyle('.'+Style.asCssID(this.wordModel.id))
-			return this[category]=new this.constructor.Properties(this.paragraphStyle)
+			return this[category]=new this.constructor.Properties(this.style)
 		case 'frame':
 			this._getPropertiesConverter('paragraph')
-			return this[category]=new this.constructor.FrameProperties(this.paragraphStyle)
+			return this[category]=new this.constructor.FrameProperties(this.style)
 		case 'numbering':
 			this._getPropertiesConverter('paragraph')
-			return this[category]=new Numbering.Properties(this.paragraphStyle)
+			return this[category]=new Numbering.Properties(this.style)
 		}
 	}
 
 	static Properties=class extends Style.Properties{
 		jc(x){
-			this.setStyle("text-align",x)
+			this.set("text-align",x)
 		}
 		ind(x){
-			x.left && (this.style.marginLeft=x.left+'pt')
-			x.right && (this.style.marginRight=x.right+'pt')
-			x.firstLine && (this.style.textIndent=x.firstLine+'pt')
-			x.hanging && (this.style.textIndent='-'+x.hanging+'pt')
+			x.left && this.set("margin-left",x.left+'pt')
+			x.right && this.set("margin-right",x.right+'pt')
+			x.firstLine && this.set("text-indent",x.firstLine+'pt')
+			x.hanging && this.set("text-indent",'-'+x.hanging+'pt')
 		}
 		spacing(x){
-			x.bottom && (this.style.marginBottom=x.bottom+'pt')
-			x.top && (this.style.marginTop=x.top+'pt')
+			x.bottom && this.set("margin-bottom",x.bottom+'pt')
+			x.top && this.set("margin-top",x.top+'pt')
 
-			x.lineHeight && (this.style.lineHeight=x.lineHeight)
+			x.lineHeight && this.set("line-height",x.lineHeight)
 		}
 	}
 

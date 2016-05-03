@@ -1,12 +1,19 @@
 import docx4js from "docx4js"
 
 var converters={
-    "*":                require("./converter/any"),
-    "document":         require("./converter/document"),
-    "section":          require("./converter/simple-page-master"),
-    "paragraph":        require('./converter/block'),
-    "inline":           require("./converter/inline"),
-    "text":             require("./converter/text")
+    "*":                require("./converter/any")
+    ,"document":         require("./converter/document")
+    ,"section":          require("./converter/simple-page-master")
+    ,"paragraph":        require('./converter/block')
+    ,"inline":           require("./converter/inline")
+    ,"text":             require("./converter/text")
+	
+	
+	,'style.document':	require('./style/document')
+	,'style.inline':		require('./style/inline')
+	//,'style.numbering.definition':	require('./style/list')
+	,'style.paragraph':	require('./style/paragraph')
+	//,'style.table':		require('./style/table')	
 }
 
 export default function docx2xsl(aDocx, option){
@@ -16,6 +23,10 @@ export default function docx2xsl(aDocx, option){
             get data(){
                 return xslDoc.data
             },
+			
+			get dom(){
+				return xslDoc.doc
+			},
 
             save(file){
                 let data=this.data

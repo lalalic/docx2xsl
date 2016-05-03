@@ -5,8 +5,16 @@ var Lines='dotted,dashed,inset,outset,solid'.split()
 export default class StyleConverter extends Converter{
 	constructor(){
 		super(...arguments)
-		var parentStyle=this.wordModel.getParentStyle();
-		parentStyle && this.doc.stylePath(this.wordModel.id, parentStyle.id)
+		this.style=this.doc.createStyle(this.styleId, this.parentStyleId)
+	}
+	
+	get styleId(){
+		return this.wordModel.id
+	}
+	
+	get parentStyleId(){
+		var {id:pid="*"}=(this.wordModel.getParentStyle()||{})
+		return pid
 	}
 
 	convert(value,name,category){
@@ -14,11 +22,11 @@ export default class StyleConverter extends Converter{
 		converter && converter[name] && converter[name](value)
 	}
 
-	_getPropertiesConverter(){
+	_getPropertiesConverter(category){
 
 	}
 
-	static Properties=class{
+	static Properties=class {
 		constructor(style,parent){
 			this.style=style
 			this.parent=parent
@@ -32,8 +40,8 @@ export default class StyleConverter extends Converter{
 			this[name] && this[name](value)
 		}
 
-		setStyle(name,value){
-			this.styel.setAttribute(name,value)
+		set(name,value){
+			this.style.setAttribute(name,value)
 		}
 
 		_border(border){

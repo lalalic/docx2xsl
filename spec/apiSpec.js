@@ -22,8 +22,11 @@ describe("docx2xsl", function(){
         expect(!!this.xsl.data).toBe(true)
     })
 
-    it("can create XSL", function(){
+    it("is a formating object", function(){
         expect(this.xsl.data).toMatch(/root/)
     })
 
+	it("is a dom", function(){
+		expect(!!this.xsl.dom).toBe(true)
+	})
 })

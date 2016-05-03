@@ -34,7 +34,7 @@ export default class Any{
 	}
 
     convertStyle(){
-
+		
 	}
 
     _shouldIgnore(){

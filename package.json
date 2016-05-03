@@ -42,7 +42,8 @@
       "prepublish": "npm run dist.min",
       "test": "jasmine",
       "test.debug": "node --debug-brk .jasmine.js",
-      "karma": "karma start"
+      "karma": "karma start",
+	  "helper.links": "node -p Object.keys(require('./package.json').devDependencies).join(' ')"
   },
   "keywords": [],
   "repository": {
