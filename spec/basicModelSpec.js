@@ -1,162 +1,155 @@
 "use strict"
 
-xdescribe("docx2xsl", function(){
+describe("docx2xsl", function(){
 	var docx2xsl=require("../lib")
 	var newDocx=require("docx4js/spec/newDocx")
 	var fop=require("./fopHelper")
+	
+	function validateAgainstFOP(data,done){
+		if(!$.isNode) 
+			return done()
+		
+		fop.fromContent(data).then(done,e=>{fail(e);done()})
+	}
 
-	function check(docx,model,done){
-		docx2xsl(newDocx(docx)).then
+	function check(xsl,model,done){
+		if(typeof(model)=='string'){
+			expect(!!xsl.dom.querySelector(model)).toBe(true)
+		}else
+			model(xsl)
+		validateAgainstFOP(xsl.data,done)
 	}
 
 	it("document",done=>
-		docx4js.load(newDocx()).then(docx=>check(docx,"document",done))
+		docx2xsl(newDocx()).then(docx=>check(docx,"root",done))
 	)
 
 	it("body",done=>
-		docx4js.load(newDocx()).then(docx=>check(docx,"body",done))
+		docx2xsl(newDocx()).then(docx=>check(docx,"page-sequence",done))
 	)
 
 	it("sections",done=>
-		docx4js.load(newDocx()).then(docx=>check(docx,"section",done))
+		docx2xsl(newDocx()).then(docx=>check(docx,"simple-page-master",done))
 	)
 
 	it("paragraph",done=>
-		docx4js.load(newDocx()).then(docx=>check(docx,"paragraph",done))
+		docx2xsl(newDocx()).then(docx=>check(docx,"block",done))
 	)
 
 	it("inline",done=>
-		docx4js.load(newDocx()).then(docx=>check(docx,"inline",done))
+		docx2xsl(newDocx()).then(docx=>check(docx,"inline",done))
 	)
 
 	it("text",done=>
-		docx4js.load(newDocx()).then(docx=>check(docx,"text",done))
+		docx2xsl(newDocx()).then(docx=>check(docx,xsl=>{
+			let text=xsl.dom.querySelector("inline").textContent
+			expect(text.length>0).toBe(true)
+		},done))
+	)
+	
+	it("table",done=>
+		docx2xsl(newDocx("<w:tbl><w:tr><w:tc><w:p><w:r><w:t>hello</w:t></w:r></w:p></w:tc></w:tr></w:tbl>"))
+			.then(docx=>check(docx,"table>table-body>table-row>table-cell block inline",done))
+			.catch(e=>{fail(e);done()})
 	)
 
-	describe("table", function(){
-		it("table",done=>
-			docx4js.load(newDocx("<w:tbl><w:tr><w:tc>hello</w:tc></w:tr></w:tbl>")).then(docx=>check(docx,"table",done))
+	describe("link", function(){
+		it("extenal", done=>
+			docx2xsl(newDocx({"word/document.xml":
+				`<w:p>
+						<w:hyperlink r:id="rId6" w:history="1">
+						  <w:r>
+							<w:rPr>
+							  <w:rStyle w:val="Hyperlink"/>
+							</w:rPr>
+							<w:t>lazy dog.</w:t>
+						  </w:r>
+						</w:hyperlink>
+				</w:p>`,
+				}))
+			.then(docx=>check(docx,"basic-link[external-destination]",done))
+			.catch(e=>{fail(e);done()})
 		)
-
-		it("row",done=>
-			docx4js.load(newDocx("<w:tbl><w:tr><w:tc>hello</w:tc></w:tr></w:tbl>")).then(docx=>check(docx,"row",done))
+		
+		it("location", done=>
+			docx2xsl(newDocx(
+				`<w:p>
+					<w:bookmarkStart w:id="0" w:name="begin"/>
+					<w:r>
+						<w:t>On the Insert tab</w:t>
+					</w:r>
+					<w:bookmarkEnd w:id="0"/>
+					<w:r>
+						<w:t>, the galleries</w:t>
+					</w:r>
+				</w:p>`))
+			.then(docx=>check(docx,"[id='begin']",done))
+			.catch(e=>{fail(e);done()})
 		)
-
-		it("cell",done=>
-			docx4js.load(newDocx("<w:tbl><w:tr><w:tc>hello</w:tc></w:tr></w:tbl>"))
-			.then(docx=>check(docx,"cell",done))
+		
+		it("internal", done=>
+			docx2xsl(newDocx(
+				`<w:p>
+					<w:bookmarkStart w:id="0" w:name="begin"/>
+					<w:r>
+						<w:t>On the Insert tab</w:t>
+					</w:r>
+					<w:bookmarkEnd w:id="0"/>
+					<w:r>
+						<w:t>, the galleries</w:t>
+					</w:r>
+				</w:p>
+				<w:p>
+					<w:hyperlink w:anchor="begin" w:history="1">
+						<w:r>
+							<w:rPr>
+								<w:rStyle w:val="Hyperlink"/>
+							</w:rPr>
+							<w:t>Home tab</w:t>
+						</w:r>
+					</w:hyperlink>
+				</w:p>`))
+			.then(docx=>check(docx,"basic-link[internal-destination]",done))
+			.catch(e=>{fail(e);done()})
 		)
-	})
-
-	it("br", done=>
-		docx4js.load(newDocx(`<w:p><w:r><w:br/></w:r><w:p>`))
-		.then(docx=>check(docx,"br", done))
-	)
-
-	it("hyperlink", done=>
-		docx4js.load(newDocx(`
-			<w:p>
-				<w:hyperlink r:id="rId8" w:history="1">
-		          <w:r w:rsidRPr="00A40242">
-		            <w:rPr>
-		              <w:rStyle w:val="Hyperlink"/>
-		            </w:rPr>
-		            <w:t>lazy dog.</w:t>
-		          </w:r>
-		          <w:proofErr w:type="gramEnd"/>
-		        </w:hyperlink>
-			</w:p>`))
-		.then(docx=>check(docx,"hyperlink",done))
-	)
-
-	it("tab",done=>
-		docx4js.load(newDocx(`<w:p><w:r><w:tab/></w:r><w:p>`))
-		.then(docx=>check(docx, "tab", done))
-	)
-
-	it("symbol")
-
-	it("softHyphen")
-
-	it("noBreakHyphen", done=>
-		docx4js.load(newDocx(`
-			<w:p>
-				<w:r>
-		  			<w:noBreakHyphen/>
-				  	<w:t xml:space="preserve"> over the </w:t>
-				</w:r>
-			</w:p>`)).then(docx=>check(docx,"noBreakHyphen",done))
-	)
-
-	it("bookmark range: bookmarkEnd", done=>{
-		docx4js.load(newDocx(`
-			<w:p>
-		      <w:bookmarkStart w:id="0" w:name="_GoBack"/>
-		      <w:r>
-		        <w:t>The quick brown fox jumps over the lazy dog.</w:t>
-		      </w:r>
-		    </w:p>
-		    <w:bookmarkEnd w:id="0"/>
-			`)).then(docx=>check(docx,"bookmarkEnd",done))
-	})
-
-	it("equation", done=>{
-		docx4js.load(newDocx(`
-			<w:p w:rsidR="00A40242" w:rsidRDefault="00A40242">
-		      <w:r>
-		        <w:t>Equation</w:t>
-		      </w:r>
-		      <w:proofErr w:type="gramStart"/>
-		      <w:r>
-		        <w:t>:</w:t>
-		      </w:r>
-		      <m:oMath>
-		        <m:r>
-		          <w:rPr>
-		            <w:rFonts w:ascii="Cambria Math" w:hAnsi="Cambria Math"/>
-		          </w:rPr>
-		          <m:t>A</m:t>
-		        </m:r>
-		        <w:proofErr w:type="gramEnd"/>
-		        <m:r>
-		          <w:rPr>
-		            <w:rFonts w:ascii="Cambria Math" w:hAnsi="Cambria Math"/>
-		          </w:rPr>
-		          <m:t>=π</m:t>
-		        </m:r>
-		        <m:sSup>
-		          <m:sSupPr>
-		            <m:ctrlPr>
-		              <w:rPr>
-		                <w:rFonts w:ascii="Cambria Math" w:hAnsi="Cambria Math"/>
-		              </w:rPr>
-		            </m:ctrlPr>
-		          </m:sSupPr>
-		          <m:e>
-		            <m:r>
-		              <w:rPr>
-		                <w:rFonts w:ascii="Cambria Math" w:hAnsi="Cambria Math"/>
-		              </w:rPr>
-		              <m:t>r</m:t>
-		            </m:r>
-		          </m:e>
-		          <m:sup>
-		            <m:r>
-		              <w:rPr>
-		                <w:rFonts w:ascii="Cambria Math" w:hAnsi="Cambria Math"/>
-		              </w:rPr>
-		              <m:t>2</m:t>
-		            </m:r>
-		          </m:sup>
-		        </m:sSup>
-		      </m:oMath>
-		    </w:p>`)).then(docx=>check(docx,"equation",done))
 	})
 	
-	describe("heading", function(){
+	it("toc")
+	
+	it("index")
+	
+	xdescribe("special characters", function(){
+		it("br", done=>
+			docx2xsl(newDocx(`<w:p><w:r><w:br/></w:r><w:p>`))
+			.then(docx=>check(docx,"br", done))
+		)
+		
+
+		it("tab",done=>
+			docx2xsl(newDocx(`<w:p><w:r><w:tab/></w:r><w:p>`))
+			.then(docx=>check(docx, "tab", done))
+		)
+
+		it("symbol")
+
+		it("softHyphen")
+
+		it("noBreakHyphen", done=>
+			docx2xsl(newDocx(`
+				<w:p>
+					<w:r>
+						<w:noBreakHyphen/>
+						<w:t xml:space="preserve"> over the </w:t>
+					</w:r>
+				</w:p>`)).then(docx=>check(docx,"noBreakHyphen",done))
+		)
+	})
+	
+	
+	xdescribe("heading", function(){
 		describe("from inline style", function(){
 			it("heading", done=>{
-				docx4js.load(newDocx(`
+				docx2xsl(newDocx(`
 					<w:p>
 					  <w:pPr>
 						<w:outlineLvl w:val="0"/>
@@ -174,7 +167,7 @@ xdescribe("docx2xsl", function(){
 			})
 
 			it("headingChar", done=>{
-				docx4js.load(newDocx(`
+				docx2xsl(newDocx(`
 					<w:p>
 					  <w:r>
 						 <w:rPr>
@@ -194,7 +187,7 @@ xdescribe("docx2xsl", function(){
 		
 		describe("from named style", function(){
 			it("heading", done=>{
-				docx4js.load(newDocx({"word/document.xml":`
+				docx2xsl(newDocx({"word/document.xml":`
 					<w:p>
 					  <w:pPr>
 						<w:pStyle w:val="Heading"/>
@@ -219,7 +212,7 @@ xdescribe("docx2xsl", function(){
 			})
 			
 			xit("headingChar", done=>{
-				docx4js.load(newDocx({"word/document.xml":`
+				docx2xsl(newDocx({"word/document.xml":`
 					<w:p>
 					  <w:r>
 						  <w:rPr>
@@ -243,7 +236,21 @@ xdescribe("docx2xsl", function(){
 
 	describe("list", function(){
 		it("from inline", done=>{
-			docx4js.load(newDocx(`
+			let List=require("docx4js/lib/openxml/docx/model/list")
+			spyOn(List.prototype,"getNumberingStyle").and.returnValue({id:"0"})
+			docx2xsl(newDocx(
+				`<w:p>
+					<w:pPr>
+						<w:pStyle w:val="ListParagraph"/>
+						<w:numPr>
+							<w:ilvl w:val="0"/>
+							<w:numId w:val="1"/>
+						</w:numPr>
+					</w:pPr>
+					<w:r>
+						<w:t>On the Insert tab, the galleries include items that are designed to coordin</w:t>
+					</w:r>
+				</w:p>
 				<w:p>
 					<w:pPr>
 						<w:pStyle w:val="ListParagraph"/>
@@ -256,13 +263,29 @@ xdescribe("docx2xsl", function(){
 						<w:t>On the Insert tab, the galleries include items that are designed to coordin</w:t>
 					</w:r>
 				</w:p>
-			`))
-			.then(docx=>check(docx,"list",done))
+				<w:p>
+					<w:pPr>
+						<w:pStyle w:val="ListParagraph"/>
+						<w:numPr>
+							<w:ilvl w:val="1"/>
+							<w:numId w:val="1"/>
+						</w:numPr>
+					</w:pPr>
+					<w:r>
+						<w:t>On the Insert tab, the galleries include items that are designed to coordin</w:t>
+					</w:r>
+				</w:p>`))
+			.then(docx=>check(docx,xsl=>{
+				expect(!!xsl.dom.querySelector("list-block list-item list-item-label+list-item-body")).toBe(true)
+				expect(!!xsl.dom.querySelector("list-block list-block")).toBe(false)
+				expect(xsl.dom.querySelectorAll("list-block").length).toBe(2)
+				expect(xsl.dom.querySelectorAll("list-item-body").length).toBe(3)
+			},done))
 			.catch(e=>{fail(e);done()})
 		})
 		
 		it("from named style", done=>{
-			docx4js.load(newDocx({"word/document.xml":`
+			docx2xsl(newDocx({"word/document.xml":`
 				<w:p>
 					<w:pPr>
 						<w:pStyle w:val="ListParagraph"/>

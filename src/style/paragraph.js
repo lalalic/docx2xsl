@@ -9,15 +9,14 @@ export default class Paragraph extends Style{
 		
 		switch(category){
 		case 'inline':
-			let inlineStyle=this.style.addCategory(category, this.doc.createStyle())
-			return this[category]=new Inline.Properties(this.style,inlineStyle)
+			return this[category]=new Inline.Properties(this.style)
 		case 'paragraph':
 			return this[category]=new this.constructor.Properties(this.style)
 		case 'frame':
-			this._getPropertiesConverter('paragraph')
+			this[category]=new this.constructor.Properties(this.style)
 			return this[category]=new this.constructor.FrameProperties(this.style)
 		case 'numbering':
-			this._getPropertiesConverter('paragraph')
+			this[category]=new this.constructor.Properties(this.style)
 			return this[category]=new Numbering.Properties(this.style)
 		}
 	}

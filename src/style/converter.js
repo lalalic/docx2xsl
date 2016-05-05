@@ -1,4 +1,4 @@
-import Converter from '../converter/any'
+import Converter from '../any'
 
 var Lines='dotted,dashed,inset,outset,solid'.split()
 
@@ -13,7 +13,7 @@ export default class StyleConverter extends Converter{
 	}
 	
 	get parentStyleId(){
-		var {id:pid="*"}=(this.wordModel.getParentStyle()||{})
+		var {id:pid}=(this.wordModel.getParentStyle()||{})
 		return pid
 	}
 

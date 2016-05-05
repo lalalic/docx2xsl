@@ -1,12 +1,22 @@
 import docx4js from "docx4js"
 
 var converters={
-    "*":                require("./converter/any")
-    ,"document":         require("./converter/document")
-    ,"section":          require("./converter/simple-page-master")
-    ,"paragraph":        require('./converter/block')
-    ,"inline":           require("./converter/inline")
-    ,"text":             require("./converter/text")
+    "*":                require("./any")
+    ,"document":         require("./document")
+    ,"section":          require("./simple-page-master")
+    ,"paragraph":        require('./block')
+    ,"inline":           require("./inline")
+    ,"text":             require("./text")
+	
+	,'hyperlink': 		require('./link')
+	,'bookmarkStart': 	require('./location')
+	
+	,'table':			require('./table')
+	,'row':				require('./table-row')
+	,'cell':			require('./table-cell')
+	
+	,'list':			require('./list')
+	
 	
 	
 	,'style.document':	require('./style/document')
@@ -19,6 +29,7 @@ var converters={
 export default function docx2xsl(aDocx, option){
     return docx4js.load(aDocx).then(docx=>{
         let xslDoc=docx.parse(docx4js.createVisitorFactory(converters))
+		xslDoc.release()
         return {
             get data(){
                 return xslDoc.data

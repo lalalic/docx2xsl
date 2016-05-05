@@ -8,9 +8,11 @@ function fop(xslFilePath){
 
     return new Promise(function(resolve, reject){
         childProcess.execFile(fopFile, childArgs, function(error, stdOut, stdErr){
-            if(error){
+			if(error){
                 reject(error)
-            } else{
+            }else if(stdErr.includes("SEVERE: Exception")){
+				reject(stdErr)
+			} else{
                 resolve(xslFilePath+".pdf")
             }
         })
