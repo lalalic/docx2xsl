@@ -4,13 +4,6 @@ export default class TableCell extends require("./any"){
 	tag="table-cell"
 	//stylable=true
 	
-	convertStyle(){
-		let container=this.doc.createElement("block")
-		this.content.appendChild(container)
-		this.content=container
-		super.convertStyle(container.parentNode)
-	}
-	
 	static StyleProperties=class extends Style.CellProperties{
 		tcBorders(x){
 			x.left && (this.style.borderLeft=this._border(x.left))

@@ -3,6 +3,7 @@ export default class List extends require("./block"){
 	**	list-block can NOT be nested
 	*/
 	convert(){
+		debugger
 		var elParent=this.parent.content, ul=elParent.lastChild;
 		var listStyle=this.wordModel.getNumberingStyle()
 		var numId=listStyle.id, level=this.wordModel.getLevel()
@@ -32,8 +33,7 @@ export default class List extends require("./block"){
 		this.listItem.appendChild(this.listItemLabel)
 		this.listItem.appendChild(this.listItemBody)
 		
-		this.listItemBody.appendChild(this.doc.createElement("block"))
-		this.listItemBody.firstChild.appendChild(this.content=this.createElement())
+		this.listItemBody.appendChild(this.content=this.createElement())
 		
 		this.convertStyle(this.content, this.labelContent)
 	}

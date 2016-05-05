@@ -235,9 +235,11 @@ describe("docx2xsl", function(){
 	
 
 	describe("list", function(){
-		it("from inline", done=>{
+		beforeEach(function(){
 			let List=require("docx4js/lib/openxml/docx/model/list")
 			spyOn(List.prototype,"getNumberingStyle").and.returnValue({id:"0"})
+		})
+		it("from inline", done=>{
 			docx2xsl(newDocx(
 				`<w:p>
 					<w:pPr>
@@ -280,8 +282,7 @@ describe("docx2xsl", function(){
 				expect(!!xsl.dom.querySelector("list-block list-block")).toBe(false)
 				expect(xsl.dom.querySelectorAll("list-block").length).toBe(2)
 				expect(xsl.dom.querySelectorAll("list-item-body").length).toBe(3)
-			},done))
-			.catch(e=>{fail(e);done()})
+			},done)).catch(e=>{fail(e);done()})
 		})
 		
 		it("from named style", done=>{
@@ -289,10 +290,6 @@ describe("docx2xsl", function(){
 				<w:p>
 					<w:pPr>
 						<w:pStyle w:val="ListParagraph"/>
-						<w:numPr>
-							<w:ilvl w:val="0"/>
-							<w:numId w:val="1"/>
-						</w:numPr>
 					</w:pPr>
 					<w:r>
 						<w:t>On the Insert tab, the galleries include items that are designed to coordin</w:t>
@@ -315,7 +312,7 @@ describe("docx2xsl", function(){
 						</w:pPr>
 					</w:style>
 			`}))
-			.then(docx=>check(docx,"list",done))
+			.then(docx=>check(docx,"list-block list-item list-item-label+list-item-body",done))
 			.catch(e=>{fail(e);done()})
 		})
 	})

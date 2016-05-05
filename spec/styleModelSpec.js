@@ -95,7 +95,7 @@ describe("docx2xsl", function(){
 					</w:p>`})).then(docx=>check(docx,xsl=>{
 						expect(!!xsl.dom.querySelector("flow [font-size='11pt']")).toBe(true)
 						expect(!!xsl.dom.querySelector("flow [font-family='fake']")).toBe(true)
-					},done))
+					},done)).catch(e=>{fail(e);done()})
 			)
 		})
 		

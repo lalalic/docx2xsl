@@ -43,20 +43,14 @@ export default class Document extends require("./any"){
 			},
 
             applyStyleOn(el,styleId){
-				
                 let style=wrappers.get(styleId)
-                let outerWrapper, innerWrapper
-                if(style){
-					outerWrapper=innerWrapper=style.cloneNode()
-                    let current=innerWrapper
-                    while(style.parentNode){
-                        outerWrapper=style.parentNode.cloneNode()
-                        outerWrapper.appendChild(current)
-                        current=outerWrapper
-                        style=style.parentNode
-                    }
-					el.parentNode.appendChild(outerWrapper)
-					innerWrapper.appendChild(el)
+                while(style){
+					Array.from(style.attributes).forEach(a=>{
+						let {name,value}=a
+						if(!el.hasAttribute(name))
+							el.setAttribute(name,value)
+					})
+					style=style.parentNode
                 }
 
 				return el
