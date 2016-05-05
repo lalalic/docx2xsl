@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+minimum structure: 
+section structure
+	multiple column
+	
+.	inline can be nested
+.	block can be nested
+.	wrapper can be nested 
+*	list-block can NOT be nested
+* 	table-cell,list-item-label,list-item-body can NOT contain wrapper as child
+
+* style attributes are always inherited 
+	* so root with document default style
+	* named style tree can be implemented with nested wrappers
+		*a->b->c   => <wrapper [a style]><wraper [b style]><wraper [c style]>...</wrapper></wraper></wraper>
+
+ header
+	? start position
+? footer
+? page numbering
+
+? numbering styles
+? table styles
+-->
+<root font-family="Arial" font-size="12pt"  xmlns="http://www.w3.org/1999/XSL/Format"> 
+	<!--root hold document default style-->
+	<layout-master-set>
+		<simple-page-master 
+			master-name="master_1462245782783" 
+			page-width="612pt" 
+			page-height="792pt" 
+			margin-left="90pt" 
+			margin-right="90pt" 
+			margin-top="72pt" 
+			margin-bottom="72pt">
+			<region-body />
+			<region-before extent="-70pt"/>
+			<region-after/>
+		</simple-page-master>
+	</layout-master-set>
+
+	<page-sequence master-reference="master_1462245782783">
+		<static-content flow-name="xsl-region-before">
+			<block>
+				<inline>On the Insert tab, the galleries include items that are designed to coordinate with the overall look of your document.</inline>
+			</block>
+		</static-content>
+		<flow flow-name="xsl-region-body">
+			<!--
+			* named styles tree implemented with wrappers with id as styleId
+			* hard copy from bottom to top when using it in content, and **remove id
+			* finally remove the whole tree
+			<wrapper id="styles">
+				<wrapper font-size="14pt" id="b">
+					<wrapper font-size="12pt" id="c">
+					
+					</wrapper>
+				</wrapper>
+				
+				<wrapper font-size="14pt" id="d">
+					
+				</wrapper>
+			</wrapper>
+			-->
+
+			<wrapper font-size="14pt">
+				<!--from b-->
+				<wrapper font-size="12pt">
+					<!--from c-->
+					<block>
+						On the Insert tab, the galleries include items that are designed to coordinate with the overall look of your document.
+					</block>
+				</wrapper>
+			</wrapper>
+
+			<block font-size="20pt">
+				<!--@todo:bug with letter spacing?-->
+				<inline letter-spacing="2pt">On the Insert tab,</inline>
+				<inline letter-spacing="2pt"> the galleries include items that are designed to coordinate with the overall look of your document.</inline>
+			</block>
+
+			<!--table-->
+			<table table-layout="fixed" width="100%">
+				<table-column column-width="50%"/>
+				<table-column column-width="50%"/>
+				<table-body>
+					<table-row>
+						<table-cell>
+							<block>
+								<!--wrapper can't be child of table-cell, so wrap everything in a block-->
+								<wrapper>
+									<block>
+										<inline>hello</inline>
+									</block>
+								</wrapper>
+								<wrapper>
+									<block>
+										<inline>hello</inline>
+									</block>
+								</wrapper>
+							</block>
+						</table-cell>
+						<table-cell>
+							<block>hello</block>
+						</table-cell>
+					</table-row>
+				</table-body>
+			</table>
+
+			<list-block id="0">
+				<!--can't be nested-->
+				<list-item>
+					<list-item-label end-indent="label-end()">
+						<block/>
+					</list-item-label>
+					<list-item-body start-indent="body-start()">
+						<block>
+							<inline>On the Insert tab, the galleries include items that are designed to coordin</inline>
+						</block>
+					</list-item-body>
+				</list-item>
+				<list-item>
+					<list-item-label end-indent="label-end()">
+						<block>
+							<wrapper>
+								<block>*</block>
+							</wrapper>
+						</block>
+					</list-item-label>
+					<list-item-body start-indent="body-start()">
+						<block>
+							<wrapper>
+								<block>
+									<inline>On the Insert tab, the galleries include items that are designed to coordin</inline>
+								</block>
+							</wrapper>
+						</block>
+					</list-item-body>
+				</list-item>
+			</list-block>
+		</flow>
+	</page-sequence>
+</root>
