@@ -37,7 +37,7 @@
   },
   "scripts":{
       "build": "babel src -d lib --source-maps inline",
-      "dist": "watchify -v -d -r ./lib:docx-hub -o dist/index.js",
+      "dist": "watchify -v -d -r ./lib:docx2xsl -o dist/index.js",
       "dist.min": "uglifyjs dist/index.js -o dist/index.min.js",
       "prepublish": "npm run dist.min",
       "test": "jasmine",

@@ -46,7 +46,7 @@ export default class StyleConverter extends Converter{
 
 		_border(border){
 			if(border.val=='none' || border.val=='nil')
-				return '0'
+				return 'none'
 			else
 				return (border.sz<1 && border.sz>0 ? 1 : border.sz)+'pt '+(Lines.indexOf(border.val.toLowerCase())!=-1 ? border.val : 'solid')+' '+(border.color||'')
 		}

@@ -5,6 +5,7 @@ var converters={
     ,"document":         require("./document")
     ,"section":          require("./simple-page-master")
     ,"paragraph":        require('./block')
+	,"heading":			 require('./heading')
     ,"inline":           require("./inline")
     ,"text":             require("./text")
 	
@@ -23,7 +24,7 @@ var converters={
 	,'style.inline':		require('./style/inline')
 	//,'style.numbering.definition':	require('./style/list')
 	,'style.paragraph':	require('./style/paragraph')
-	//,'style.table':		require('./style/table')	
+	,'style.table':		require('./style/table')	
 }
 
 export default function docx2xsl(aDocx, option){

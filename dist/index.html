@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="index.js"></script>
+	<script>
+		function test(input){
+			require("docx2xsl")(input.files[0])
+				.then(xsl=>text.value=xsl.data)
+				.catch(e=>{console.log(e);text.value=e.message})
+		}
+	</script>
+</head>
+<body>
+	<input type="file" style="position:absolute;top:0" onchange="test(this)">
+	<br/>
+	<br/>
+	<textarea id="text" style="width:100%;" rows="20"></textarea>
+</body>
+</html>

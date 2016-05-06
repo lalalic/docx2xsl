@@ -2,16 +2,29 @@ import Style from './style/table'
 
 export default class TableCell extends require("./any"){
 	tag="table-cell"
-	//stylable=true
+	
+	get tableStyleId(){//assert this.parent is a cell
+		return this.parent.tableStyleId
+	}
+	
+	convertStyle(){
+		let directStyle=this.wordModel.getDirectStyle()
+		
+		let style=this.doc.createStyle(this.content, this.tableStyleId+".table-cell")
+		
+		if(directStyle)
+			directStyle.parse([new this.constructor.StyleProperties(style, this)])
+		
+		return style
+	}
 	
 	static StyleProperties=class extends Style.CellProperties{
 		tcBorders(x){
-			x.left && (this.style.borderLeft=this._border(x.left))
-			x.right && (this.style.borderRight=this._border(x.right))
-			x.top && (this.style.borderTop=this._border(x.top))
-			x.bottom && (this.style.borderBottom=this._border(x.bottom))
+			Object.keys(x).forEach(a=>this.set(`border-${a}`,this._border(x[a])))
 		}
+		
 		cnfStyle(x){
+			return;
 			var names=[], PrioritiziedStyles=Style.prototype.PrioritiziedStyles, level=-1, t
 			for(var i=0;i<12;i++){
 				if(x.charAt(i)=='1'){

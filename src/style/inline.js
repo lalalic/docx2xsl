@@ -9,7 +9,12 @@ export default class Inline extends Style{
 	
 	static Properties=class extends Style.Properties{
 		rFonts(x){
-			x.ascii && this.set("font-family",x.ascii)
+			let fonts=""
+			
+			x.ascii && (fonts=`'${x.ascii}'`)
+			x.asia && (fonts=`${fonts}, '${x.asia}'`)
+
+			fonts.length && this.set("font-family",fonts)
 		}
 		b(x){
 			this.set("font-weight",700)
@@ -21,7 +26,7 @@ export default class Inline extends Style{
 			this.set("color",x)
 		}
 		i(x){
-			this.set("font-style",'italics')
+			this.set("font-style",'italic')
 		}
 		u(x){
 			this.set("text-decoration",'underline')
@@ -45,5 +50,36 @@ export default class Inline extends Style{
 		highlight(x){
 			this.set("background-color",x)
 		}
+		
+		kern(x){//word spacing
+			this.set("word-spacing", x)
+		}
+		
+		w(x){//char scale
+			
+		}
+		
+		spacing(x){//char spacing
+			this.set("letter-spacing",x+'pt')
+		}
+		
+		position(x){//baseline shift
+			
+		}
+		
+		/* toggle properties
+		smallCaps(){
+			this.set("font-variant","small-caps")
+		}
+		
+		caps(x){
+			switch(x){
+			case '1':
+				this.set("text-transform","uppercase")
+			break
+			}
+				
+		}
+		*/
 	}
 }

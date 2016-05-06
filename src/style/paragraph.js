@@ -37,6 +37,10 @@ export default class Paragraph extends Style{
 
 			x.lineHeight && this.set("line-height",x.lineHeight)
 		}
+		
+		pBdr(x){
+			Object.keys(x).forEach(key=>this.set(`border-${key}`,this._border(x[key])))
+		}
 	}
 
 	static FrameProperties=class extends Style.Properties{

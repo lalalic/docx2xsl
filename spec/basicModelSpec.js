@@ -19,6 +19,10 @@ describe("docx2xsl", function(){
 			model(xsl)
 		validateAgainstFOP(xsl.data,done)
 	}
+	
+	function failx(done){
+		return e=>{fail(e);done()}
+	}
 
 	it("document",done=>
 		docx2xsl(newDocx()).then(docx=>check(docx,"root",done))

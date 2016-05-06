@@ -139,6 +139,10 @@ section structure
 					</list-item-body>
 				</list-item>
 			</list-block>
+			
+			<block>
+				<inline color="red">Aa</inline>
+			</block>
 		</flow>
 	</page-sequence>
 </root>

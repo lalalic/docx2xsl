@@ -6,6 +6,10 @@ export default class List extends require("./block"){
 		debugger
 		var elParent=this.parent.content, ul=elParent.lastChild;
 		var listStyle=this.wordModel.getNumberingStyle()
+		if(listStyle==null){
+			console.error("identified as list, but there's no numbering definition for it; transform as normal paragraph")
+			return super.convert()
+		}
 		var numId=listStyle.id, level=this.wordModel.getLevel()
 		
 		if(!ul || ul.tagName!='list-block' 		//not list
@@ -37,11 +41,7 @@ export default class List extends require("./block"){
 		
 		this.convertStyle(this.content, this.labelContent)
 	}
-	
-	convertStyle(body,label){
-		super.convertStyle(body)
-		
-	}
+
 	
 	static release(doc){
 		doc.root.querySelectorAll("list-block")

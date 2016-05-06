@@ -5,17 +5,28 @@ describe("docx2xsl", function(){
 	var newDocx=require("docx4js/spec/newDocx")
 	var fop=require("./fopHelper")
 	
+	function validateAgainstFOP(data,done){
+		if(!$.isNode) 
+			return done()
+		
+		fop.fromContent(data).then(done,e=>{fail(e);done()})
+	}
+
 	function check(xsl,model,done){
-		if(typeof(model)=="string")
+		if(typeof(model)=='string'){
 			expect(!!xsl.dom.querySelector(model)).toBe(true)
-		else
+		}else
 			model(xsl)
-		done()
+		validateAgainstFOP(xsl.data,done)
+	}
+	
+	function failx(done){
+		return e=>{fail(e);done()}
 	}
 	
 	describe("styles", function(){
 		it("document default style on root",done=>
-			docx2xsl(newDocx()).then(docx=>check(docx,"root[font-family=Arial]",done))
+			docx2xsl(newDocx()).then(docx=>check(docx,"root[font-family*=Arial]",done))
 		)
 		
 		it("section style on page master",done=>
@@ -41,7 +52,7 @@ describe("docx2xsl", function(){
 							<w:sz w:val="22"/>
 						</w:rPr>
 					</w:style>`})).then(docx=>check(docx,"flow [font-size='11pt']",done))
-					.catch(e=>{fail(e);done()})
+					.catch(failx(done))
 			)
 			
 			it("multiple leveled paragraph style",done=>
@@ -68,7 +79,7 @@ describe("docx2xsl", function(){
 					</w:p>`})).then(docx=>check(docx,xsl=>{
 						expect(!!xsl.dom.querySelector("flow [font-size='11pt']")).toBe(true)
 						expect(!!xsl.dom.querySelector("flow [text-align='center']")).toBe(true)
-					},done)).catch(e=>{fail(e);done()})
+					},done)).catch(failx(done))
 			)
 			
 			it("multiple leveled inline style",done=>
@@ -94,8 +105,8 @@ describe("docx2xsl", function(){
 						</w:r>
 					</w:p>`})).then(docx=>check(docx,xsl=>{
 						expect(!!xsl.dom.querySelector("flow [font-size='11pt']")).toBe(true)
-						expect(!!xsl.dom.querySelector("flow [font-family='fake']")).toBe(true)
-					},done)).catch(e=>{fail(e);done()})
+						expect(!!xsl.dom.querySelector("flow [font-family*='fake']")).toBe(true)
+					},done)).catch(failx(done))
 			)
 		})
 		
@@ -106,19 +117,107 @@ describe("docx2xsl", function(){
 			
 			it("Common Aural Properties").pend("not support")
 			
-			it("Common Border, Padding, and Background Properties")
+			it("background")
 			
-			it("Common Font Properties:family,size", done=>
+			describe("Common Border, Padding, and margin Properties of block", function(){
+				describe("border",function(){
+					it("border", done=>
+						docx2xsl(newDocx(
+							`<w:p>
+								<w:pPr>
+									<w:pBdr>
+										<w:top w:val="single" w:sz="4" w:space="1" w:color="FF0000"/>
+										<w:bottom w:val="single" w:sz="4" w:space="1" w:color="FF0000"/>
+										<w:right w:val="single" w:sz="4" w:space="4" w:color="FF0000"/>
+									</w:pBdr>
+								</w:pPr>
+									<w:r>
+										<w:t>On the Insert tab.</w:t>
+									</w:r>
+							</w:p>`)).then(docx=>check(docx,xsl=>{
+							expect(!!xsl.dom.querySelector("[border-top][border-bottom][border-right]")).toBe(true)
+							expect(!!xsl.dom.querySelector("[border-left]")).toBe(false)
+							expect(!!xsl.dom.querySelector("[border-top='1pt solid #FF0000']")).toBe(true)
+						},done)).catch(failx(done))
+					)
+				})
+				
+				describe("table", function(){
+					it("named table border",done=>{
+						docx2xsl(newDocx(
+							`<w:p>
+								<w:pPr>
+									<w:pBdr>
+										<w:top w:val="single" w:sz="4" w:space="1" w:color="FF0000"/>
+										<w:bottom w:val="single" w:sz="4" w:space="1" w:color="FF0000"/>
+										<w:right w:val="single" w:sz="4" w:space="4" w:color="FF0000"/>
+									</w:pBdr>
+								</w:pPr>
+									<w:r>
+										<w:t>On the Insert tab.</w:t>
+									</w:r>
+							</w:p>`)).then(docx=>check(docx,xsl=>{
+							expect(!!xsl.dom.querySelector("[border-top][border-bottom][border-right]")).toBe(true)
+							expect(!!xsl.dom.querySelector("[border-left]")).toBe(false)
+							expect(!!xsl.dom.querySelector("[border-top='1pt solid #FF0000']")).toBe(true)
+						},done)).catch(failx(done))
+					})
+					
+					it("named table with cell border")
+					
+
+					it("named table border, and with cell border")
+					
+					fit("direct cell",done=>{
+						docx2xsl(newDocx(
+							`<w:tbl>
+								<w:tblGrid>
+									<w:gridCol w:w="2214"/>
+									<w:gridCol w:w="2214"/>
+									<w:gridCol w:w="2214"/>
+									<w:gridCol w:w="2214"/>
+								</w:tblGrid>
+								<w:tr>
+									<w:tc>
+										<w:tcPr>
+											<w:tcW w:w="2214" w:type="dxa"/>
+											<w:tcBorders>
+												<w:top w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
+												<w:bottom w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
+												<w:right w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
+											</w:tcBorders>
+										</w:tcPr>
+										<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+											<w:r><w:t>hello</w:t></w:r>
+										</w:p>
+									</w:tc>
+									</w:tr>
+								</w:tbl>`)).then(docx=>check(docx,xsl=>{
+							expect(!!xsl.dom.querySelector("[border-top][border-bottom][border-right]")).toBe(true)
+							expect(!!xsl.dom.querySelector("[border-left]")).toBe(false)
+							expect(!!xsl.dom.querySelector("[border-top='1pt solid #FF0000']")).toBe(true)
+						},done)).catch(failx(done))
+					})
+				})
+			})
+			
+			it("Font:family,size,style,weight, [! variant, stretch, selection-strategy, size-adjust]", done=>
 				docx2xsl(newDocx(
 					`<w:p>
 						<w:r>
 							<w:rPr>
-								<w:rFonts w:ascii="Arial"/>
+								<w:rFonts w:ascii="Arial Unicode" w:eastAsia="宋体"/>
 								<w:sz w:val="22"/>
+								<w:b/>
+								<w:i/>
 							</w:rPr>
 						<w:t>On the Insert tab.</w:t>
 						</w:r>
-					</w:p>`)).then(docx=>check(docx,"inline[font-family][font-size]",done))
+					</w:p>`)).then(docx=>check(docx,xsl=>{
+						expect(!!xsl.dom.querySelector("[font-family][font-size][font-style][font-weight]")).toBe(true)
+						expect(!!xsl.dom.querySelector("[font-family*='宋体']")).toBe(true)
+						expect(!!xsl.dom.querySelector("[font-family*='Arial Unicode']")).toBe(true)
+					},done)).catch(failx(done))
 			)
 			
 			it("Common Hyphenation Properties")
@@ -126,6 +225,99 @@ describe("docx2xsl", function(){
 			it("Common Margin Properties-Block")
 			
 			it("Common Relative Position Properties")
+			
+			describe("color, [!color-profile-name,rendering-intent]", function(){
+				it("RGB", done=>{
+					docx2xsl(newDocx(
+						`<w:p>
+							<w:r>
+								<w:rPr>
+									<w:color w:val="00B050"/>
+								</w:rPr>
+							<w:t>On the Insert tab.</w:t>
+							</w:r>
+						</w:p>`)).then(docx=>check(docx,"[color='#00B050']",done)).catch(failx(done))
+				})
+				
+				it("name:red", done=>{
+					docx2xsl(newDocx(
+						`<w:p>
+							<w:r>
+								<w:rPr>
+									<w:color w:val="red"/>
+								</w:rPr>
+							<w:t>On the Insert tab.</w:t>
+							</w:r>
+						</w:p>`)).then(docx=>check(docx,"[color='red']",done)).catch(failx(done))
+				})
+			})
+			
+			
+			describe("character",function(){
+				it("word-spacing letter-spacing", done=>
+					docx2xsl(newDocx(
+						`<w:p>
+							<w:r>
+								<w:rPr>
+									<w:spacing w:val="32"/>
+									<w:kern w:val="40"/>
+								</w:rPr>
+							<w:t>On the Insert tab.</w:t>
+							</w:r>
+						</w:p>`)).then(docx=>check(docx,"[word-spacing][letter-spacing]",done))
+						.catch(failx(done))
+				)
+				
+				it("vertical-align", done=>
+					docx2xsl(newDocx(
+						`<w:p>
+							<w:r>
+								<w:rPr>
+									<w:vertAlign w:val="subscript"/>
+								</w:rPr>
+							<w:t>sub</w:t>
+							</w:r>
+							<w:r>
+								<w:rPr>
+									<w:vertAlign w:val="superscript"/>
+								</w:rPr>
+							<w:t>super</w:t>
+							</w:r>
+						</w:p>`)).then(docx=>check(docx,xsl=>{
+							expect(!!xsl.dom.querySelector("[vertical-align='sub']")).toBe(true)
+							expect(!!xsl.dom.querySelector("[vertical-align='super']")).toBe(true)
+						},done))
+						.catch(failx(done))
+				)
+				
+				it("border", done=>{
+					docx2xsl(newDocx(
+						`<w:p>
+							<w:r>
+								<w:rPr>
+									<w:bdr w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
+								</w:rPr>
+							<w:t>super</w:t>
+							</w:r>
+						</w:p>`)).then(docx=>check(docx,xsl=>{
+							expect(!!xsl.dom.querySelector("[border='1pt solid #FF0000']")).toBe(true)
+						},done))
+						.catch(failx(done))
+				})
+			})
+		})
+		
+		it("alignment [!distribute]", done=>{
+			docx2xsl(newDocx(
+						`<w:p>
+							<w:pPr>
+								<w:jc w:val="center"/>
+							</w:pPr>
+							<w:r>
+								<w:t>hello</w:t>
+							</w:r>
+						</w:p>`)).then(docx=>check(docx,"[text-align='center']",done))
+						.catch(failx(done))
 		})
 		
 		describe("inline styles", function(){
@@ -133,6 +325,8 @@ describe("docx2xsl", function(){
 		})
 		
 		describe("specific styles", function(){
+			
+			
 			/*
 			Area Alignment Properties
 
