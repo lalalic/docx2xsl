@@ -27,7 +27,7 @@ export default class List extends require("./block"){
 		this.listItemLabel=this.doc.createElement("list-item-label")
 		this.listItemLabel.appendChild(this.labelContent=this.doc.createElement("block"))
 		this.listItemLabel.setAttribute("end-indent","label-end()")
-		this.labelContent.appendChild(this.doc.createTextNode(this.wordModel.label))
+		this.labelContent.appendChild(this.doc.createTextNode(this.wordModel.getLabel()))
 		
 		this.listItemBody=this.doc.createElement("list-item-body")
 		this.listItemBody.setAttribute("start-indent","body-start()")

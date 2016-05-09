@@ -242,6 +242,7 @@ describe("docx2xsl", function(){
 		beforeEach(function(){
 			let List=require("docx4js/lib/openxml/docx/model/list")
 			spyOn(List.prototype,"getNumberingStyle").and.returnValue({id:"0"})
+			spyOn(List.prototype,"getLabel").and.returnValue("*")
 		})
 		it("from inline", done=>{
 			docx2xsl(newDocx(

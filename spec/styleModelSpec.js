@@ -501,7 +501,7 @@ describe("docx2xsl", function(){
 					.catch(failx(done))
 			)
 			
-			fit("multi lists", done=>
+			it("multi lists", done=>
 				docx2xsl(newDocx({"word/numbering.xml":`
 					<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" >
 						<w:abstractNum w:abstractNumId="0">
@@ -578,7 +578,7 @@ describe("docx2xsl", function(){
 					.catch(failx(done))
 			)
 			
-			it("numbering",done=>
+			xit("numbering",done=>
 				docx4js.load(newDocx({"word/styles.xml":`
 					<w:style w:type="numbering" w:default="1" w:styleId="NoList">
 						<w:name w:val="No List"/>
