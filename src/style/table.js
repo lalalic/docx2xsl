@@ -84,7 +84,7 @@ Table.Properties=class Properties extends Style.Properties{
 	
 	
 	cellStyle(condition, borderSide, value, priority){
-		this.priorities[borderSide][priority].push({condition,value})
+		this.priorities.set(borderSide, pripriority.push({condition,value}))
 		return this.doc.createStyle(this.parent.styleId+".*table-cell")
 	}
 	tblBorders(x){

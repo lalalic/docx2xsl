@@ -21,8 +21,9 @@ var converters={
 	
 	
 	,'style.document':	require('./style/document')
-	,'style.inline':		require('./style/inline')
-	//,'style.numbering.definition':	require('./style/list')
+	,'style.inline':	require('./style/inline')
+	//,'style.list':		require("./style/list")
+	//,'style.numbering.definition':	require('./style/numbering')
 	,'style.paragraph':	require('./style/paragraph')
 	,'style.table':		require('./style/table')	
 }

@@ -168,7 +168,7 @@ describe("docx2xsl", function(){
 
 					it("named table border, and with cell border")
 					
-					fit("direct cell",done=>{
+					it("direct cell",done=>{
 						docx2xsl(newDocx(
 							`<w:tbl>
 								<w:tblGrid>
@@ -397,16 +397,16 @@ describe("docx2xsl", function(){
 		})
 		
 		
-		xdescribe("numbering style", function(){
-			it("list is from <w:num>", done=>
-				docx4js.load(newDocx({"word/numbering.xml":`
+		describe("numbering style", function(){
+			it("label text: level,start", done=>
+				docx2xsl(newDocx({"word/numbering.xml":`
 					<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" >
 						<w:abstractNum w:abstractNumId="0">
 							<w:nsid w:val="36965BDB"/>
 							<w:multiLevelType w:val="multilevel"/>
 							<w:tmpl w:val="0409001D"/>
 							<w:lvl w:ilvl="0">
-								<w:start w:val="1"/>
+								<w:start w:val="3"/>
 								<w:numFmt w:val="decimal"/>
 								<w:lvlText w:val="%1)"/>
 								<w:lvlJc w:val="left"/>
@@ -415,10 +415,167 @@ describe("docx2xsl", function(){
 								</w:pPr>
 							</w:lvl>
 						</w:abstractNum>
-						<w:num w:numId="3">
+						<w:num w:numId="1">
 							<w:abstractNumId w:val="0"/>
 						</w:num>
-					</w:numbering>`})).then(docx=>check(docx,"style.list",done))
+					</w:numbering>`,
+					"word/document.xml":`
+					<w:p>
+						<w:pPr>
+							<w:pStyle w:val="ListParagraph"/>
+							<w:numPr>
+								<w:ilvl w:val="0"/>
+								<w:numId w:val="1"/>
+							</w:numPr>
+						</w:pPr>
+						<w:r>
+							<w:t>On the Insert tab</w:t>
+						</w:r>
+					</w:p>`})).then(xsl=>check(xsl,xsl=>{
+						let label=xsl.dom.querySelector("list-item-label")
+						expect(!!label).toBe(true)
+						expect(label.textContent).toBe("3)")
+					},done))
+					.catch(failx(done))
+			)
+			
+			it("multilevel label text", done=>
+				docx2xsl(newDocx({"word/numbering.xml":`
+					<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" >
+						<w:abstractNum w:abstractNumId="0">
+							<w:nsid w:val="36965BDB"/>
+							<w:multiLevelType w:val="multilevel"/>
+							<w:tmpl w:val="0409001D"/>
+							<w:lvl w:ilvl="0">
+								<w:start w:val="3"/>
+								<w:numFmt w:val="decimal"/>
+								<w:lvlText w:val="%1)"/>
+								<w:lvlJc w:val="left"/>
+								<w:pPr>
+									<w:ind w:left="360" w:hanging="360"/>
+								</w:pPr>
+							</w:lvl>
+							<w:lvl w:ilvl="1">
+								<w:start w:val="2"/>
+								<w:numFmt w:val="decimal"/>
+								<w:lvlText w:val="%1.%2)"/>
+								<w:lvlJc w:val="left"/>
+								<w:pPr>
+									<w:ind w:left="360" w:hanging="360"/>
+								</w:pPr>
+							</w:lvl>
+						</w:abstractNum>
+						<w:num w:numId="1">
+							<w:abstractNumId w:val="0"/>
+						</w:num>
+					</w:numbering>`,
+					"word/document.xml":`
+					<w:p>
+						<w:pPr>
+							<w:pStyle w:val="ListParagraph"/>
+							<w:numPr>
+								<w:ilvl w:val="0"/>
+								<w:numId w:val="1"/>
+							</w:numPr>
+						</w:pPr>
+						<w:r>
+							<w:t>On the Insert tab</w:t>
+						</w:r>
+					</w:p><w:p>
+						<w:pPr>
+							<w:pStyle w:val="ListParagraph"/>
+							<w:numPr>
+								<w:ilvl w:val="1"/>
+								<w:numId w:val="1"/>
+							</w:numPr>
+						</w:pPr>
+						<w:r>
+							<w:t>On the Insert tab</w:t>
+						</w:r>
+					</w:p>`})).then(xsl=>check(xsl,xsl=>{
+						let labels=Array.from(xsl.dom.querySelectorAll("list-item-label"))
+						expect(labels.length).toBe(2)
+						expect(labels[0].textContent).toBe("3)")
+						expect(labels[1].textContent).toBe("3.2)")
+					},done))
+					.catch(failx(done))
+			)
+			
+			fit("multi lists", done=>
+				docx2xsl(newDocx({"word/numbering.xml":`
+					<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" >
+						<w:abstractNum w:abstractNumId="0">
+							<w:nsid w:val="36965BDB"/>
+							<w:multiLevelType w:val="multilevel"/>
+							<w:tmpl w:val="0409001D"/>
+							<w:lvl w:ilvl="0">
+								<w:start w:val="3"/>
+								<w:numFmt w:val="decimal"/>
+								<w:lvlText w:val="%1)"/>
+								<w:lvlJc w:val="left"/>
+								<w:pPr>
+									<w:ind w:left="360" w:hanging="360"/>
+								</w:pPr>
+							</w:lvl>
+							<w:lvl w:ilvl="1">
+								<w:start w:val="2"/>
+								<w:numFmt w:val="decimal"/>
+								<w:lvlText w:val="%1.%2)"/>
+								<w:lvlJc w:val="left"/>
+								<w:pPr>
+									<w:ind w:left="360" w:hanging="360"/>
+								</w:pPr>
+							</w:lvl>
+						</w:abstractNum>
+						<w:num w:numId="1">
+							<w:abstractNumId w:val="0"/>
+						</w:num>
+						<w:num w:numId="2">
+							<w:abstractNumId w:val="0"/>
+						</w:num>
+					</w:numbering>`,
+					"word/document.xml":`
+					<w:p>
+						<w:pPr>
+							<w:pStyle w:val="ListParagraph"/>
+							<w:numPr>
+								<w:ilvl w:val="0"/>
+								<w:numId w:val="1"/>
+							</w:numPr>
+						</w:pPr>
+						<w:r>
+							<w:t>On the Insert tab</w:t>
+						</w:r>
+					</w:p><w:p>
+						<w:pPr>
+							<w:pStyle w:val="ListParagraph"/>
+							<w:numPr>
+								<w:ilvl w:val="0"/>
+								<w:numId w:val="2"/>
+							</w:numPr>
+						</w:pPr>
+						<w:r>
+							<w:t>On the Insert tab</w:t>
+						</w:r>
+					</w:p><w:p>
+						<w:pPr>
+							<w:pStyle w:val="ListParagraph"/>
+							<w:numPr>
+								<w:ilvl w:val="1"/>
+								<w:numId w:val="1"/>
+							</w:numPr>
+						</w:pPr>
+						<w:r>
+							<w:t>On the Insert tab</w:t>
+						</w:r>
+					</w:p>`})).then(xsl=>check(xsl,xsl=>{
+						let labels=Array.from(xsl.dom.querySelectorAll("list-item-label"))
+						expect(labels.length).toBe(3)
+						expect(labels[0].textContent).toBe("3)")
+						expect(labels[1].textContent).toBe("3)")
+						expect(labels[2].textContent).toBe("3.2)")
+					},done))
+					.catch(failx(done))
 			)
 			
 			it("numbering",done=>
