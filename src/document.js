@@ -11,7 +11,7 @@ export default class Document extends require("./any"){
         this.root=this.doc.root=this.content=this.doc.documentElement
         this.layoutMasterSet=this.doc.layoutMasterSet=this.content.firstChild
 		this.bookmarkTree=this.doc.bookmarkTree=this.root.querySelector("bookmark-tree")
-		
+
 
         let styles=[] ,wrappers=new Map()
         wrappers.set('*',this.root)
@@ -29,10 +29,10 @@ export default class Document extends require("./any"){
 
 				if(id=='*')
 					return this.root
-				
+
 				if(wrappers.has(id))
 					return wrapper.get(id)
-				
+
 				let wrapper=this.createElement("wrapper")
                 let parent=wrappers.get(pid)
                 if(parent)
@@ -50,23 +50,19 @@ export default class Document extends require("./any"){
                 while(style){
 					Array.from(style.attributes).forEach(a=>{
 						let {name,value}=a
-						if(!el.hasAttribute(name)){
-							if(typeof(value)=='function')
-								value(el)
-							else
-								el.setAttribute(name,value)
-						}
+						if(!el.hasAttribute(name))
+                            el.setAttribute(name,value)
 					})
 					style=style.parentNode
                 }
-				
+
 				//@todo: toggle attributes
 
 				return el
             }
 		})
     }
-	
+
 	release(){
 		require("./list").release(this)
 	}
