@@ -143,24 +143,8 @@ describe("docx2xsl", function(){
 				})
 				
 				describe("table", function(){
-					it("named table border",done=>{
-						docx2xsl(newDocx(
-							`<w:p>
-								<w:pPr>
-									<w:pBdr>
-										<w:top w:val="single" w:sz="4" w:space="1" w:color="FF0000"/>
-										<w:bottom w:val="single" w:sz="4" w:space="1" w:color="FF0000"/>
-										<w:right w:val="single" w:sz="4" w:space="4" w:color="FF0000"/>
-									</w:pBdr>
-								</w:pPr>
-									<w:r>
-										<w:t>On the Insert tab.</w:t>
-									</w:r>
-							</w:p>`)).then(docx=>check(docx,xsl=>{
-							expect(!!xsl.dom.querySelector("[border-top][border-bottom][border-right]")).toBe(true)
-							expect(!!xsl.dom.querySelector("[border-left]")).toBe(false)
-							expect(!!xsl.dom.querySelector("[border-top='1pt solid #FF0000']")).toBe(true)
-						},done)).catch(failx(done))
+					it("named table border", ()=>{
+						
 					})
 					
 					it("named table with cell border")
@@ -168,36 +152,143 @@ describe("docx2xsl", function(){
 
 					it("named table border, and with cell border")
 					
-					it("direct cell",done=>{
-						docx2xsl(newDocx(
-							`<w:tbl>
-								<w:tblGrid>
-									<w:gridCol w:w="2214"/>
-									<w:gridCol w:w="2214"/>
-									<w:gridCol w:w="2214"/>
-									<w:gridCol w:w="2214"/>
-								</w:tblGrid>
-								<w:tr>
-									<w:tc>
-										<w:tcPr>
-											<w:tcW w:w="2214" w:type="dxa"/>
-											<w:tcBorders>
-												<w:top w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
-												<w:bottom w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
-												<w:right w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
-											</w:tcBorders>
-										</w:tcPr>
-										<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
-											<w:r><w:t>hello</w:t></w:r>
-										</w:p>
-									</w:tc>
+					describe("direct style", function(){
+						it("table",done=>{
+							docx2xsl(newDocx(
+								`<w:tbl>
+									<w:tblGrid>
+										<w:gridCol w:w="2214"/>
+										<w:gridCol w:w="2214"/>
+									</w:tblGrid>
+									<w:tblPr>
+										<w:tblBorders>
+											<w:top w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:left w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:bottom w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:right w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:insideH w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:insideV w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+										</w:tblBorders>
+									</w:tblPr>
+									<w:tr>
+										<w:tc>
+											<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+												<w:r><w:t>hello</w:t></w:r>
+											</w:p>
+										</w:tc>
+										<w:tc>
+											<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+												<w:r><w:t>hello</w:t></w:r>
+											</w:p>
+										</w:tc>
 									</w:tr>
-								</w:tbl>`)).then(docx=>check(docx,xsl=>{
-							expect(!!xsl.dom.querySelector("[border-top][border-bottom][border-right]")).toBe(true)
-							expect(!!xsl.dom.querySelector("[border-left]")).toBe(false)
-							expect(!!xsl.dom.querySelector("[border-top='1pt solid #FF0000']")).toBe(true)
-						},done)).catch(failx(done))
+									<w:tr>
+										<w:tc>
+											<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+												<w:r><w:t>hello</w:t></w:r>
+											</w:p>
+										</w:tc>
+										<w:tc>
+											<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+												<w:r><w:t>hello</w:t></w:r>
+											</w:p>
+										</w:tc>
+									</w:tr>
+									</w:tbl>`)).then(docx=>check(docx,xsl=>{
+								var cells=xsl.dom.querySelectorAll("table-cell")
+								var first=cells[0]
+								expect(!!first).toBe(true)
+								expect(cells.length).toBe(4)
+								expect(first.hasAttribute("border-top")).toBe(true)
+								expect(first.hasAttribute("border-left")).toBe(true)
+								expect(first.hasAttribute("border-right")).toBe(false)
+								
+								expect(cells[1].hasAttribute("border-right")).toBe(true)
+							},done)).catch(failx(done))
+						})
+						
+						it("table",done=>{
+							docx2xsl(newDocx(
+								`<w:tbl>
+									<w:tblGrid>
+										<w:gridCol w:w="2214"/>
+										<w:gridCol w:w="2214"/>
+									</w:tblGrid>
+									<w:tblPr>
+										<w:tblBorders>
+											<w:top w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:left w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:bottom w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:right w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:insideH w:val="single" w:sz="8" w:space="0" w:color="8064A2"/>
+											<w:insideV w:val="single" w:sz="0" w:space="0" w:color="8064A2"/>
+										</w:tblBorders>
+									</w:tblPr>
+									<w:tr>
+										<w:tc>
+											<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+												<w:r><w:t>hello</w:t></w:r>
+											</w:p>
+										</w:tc>
+										<w:tc>
+											<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+												<w:r><w:t>hello</w:t></w:r>
+											</w:p>
+										</w:tc>
+									</w:tr>
+									<w:tr>
+										<w:tc>
+											<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+												<w:r><w:t>hello</w:t></w:r>
+											</w:p>
+										</w:tc>
+										<w:tc>
+											<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+												<w:r><w:t>hello</w:t></w:r>
+											</w:p>
+										</w:tc>
+									</w:tr>
+									</w:tbl>`)).then(docx=>check(docx,xsl=>{
+								var cells=xsl.dom.querySelectorAll("table-cell")
+								expect(cells.length).toBe(4)
+								expect(cells[0].hasAttribute("border-right")).toBe(false)
+								
+								expect(cells[1].getAttribute("border-left")).toMatch("0pt")
+							},done)).catch(failx(done))
+						})
+						
+						it("cell",done=>{
+							docx2xsl(newDocx(
+								`<w:tbl>
+									<w:tblGrid>
+										<w:gridCol w:w="2214"/>
+										<w:gridCol w:w="2214"/>
+										<w:gridCol w:w="2214"/>
+										<w:gridCol w:w="2214"/>
+									</w:tblGrid>
+									<w:tr>
+										<w:tc>
+											<w:tcPr>
+												<w:tcW w:w="2214" w:type="dxa"/>
+												<w:tcBorders>
+													<w:top w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
+													<w:bottom w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
+													<w:right w:val="single" w:sz="4" w:space="0" w:color="FF0000"/>
+												</w:tcBorders>
+											</w:tcPr>
+											<w:p w:rsidR="00341AB1" w:rsidRDefault="00341AB1" w:rsidP="00964CD6">
+												<w:r><w:t>hello</w:t></w:r>
+											</w:p>
+										</w:tc>
+										</w:tr>
+									</w:tbl>`)).then(docx=>check(docx,xsl=>{
+								expect(!!xsl.dom.querySelector("[border-top][border-bottom][border-right]")).toBe(true)
+								expect(!!xsl.dom.querySelector("[border-left]")).toBe(false)
+								expect(!!xsl.dom.querySelector("[border-top='1pt solid #FF0000']")).toBe(true)
+							},done)).catch(failx(done))
+						})
 					})
+					
 				})
 			})
 			

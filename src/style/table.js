@@ -49,25 +49,6 @@ export default class Table extends Style{
 	}
 }
 
-function findTable(cell){
-	return cell.parentNode.parentNode
-}
-
-function findRow(cell){
-	return cell.parentNode
-}
-
-function is(table,row, cell, condition){
-	return Array.from(table.querySelectorAll(condition)).indexOf(cell)!=-1
-}
-
-class Priorities{
-	constructor(){
-
-	}
-
-}
-
 Table.Properties=class Properties extends Style.Properties{
 	tblBorders(x){
 		let parentStyleId=this.parent.styleId
@@ -119,8 +100,8 @@ Table.CellProperties=class CellProperties extends Style.Properties{
 			case 'band2Horz':
 				x.top && this.set("border-top", this._border(x.top))
 				x.bottom && this.set("border-bottom", this._border(x.bottom))
-				x.left && this.doc.createStyle(`${parentStyleId}.*firstCol`).set("border-left",this._border(x.left)
-				x.right && this.doc.createStyle(`${parentStyleId}.*lastCol`).set("border-right",this._border(x.right)
+				x.left && this.doc.createStyle(`${parentStyleId}.*firstCol`).set("border-left",this._border(x.left))
+				x.right && this.doc.createStyle(`${parentStyleId}.*lastCol`).set("border-right",this._border(x.right))
 				x.insideV && this.doc.createStyle(parentStyleId+".*!firstCol").set("border-left",this._border(x.insideV))
 			break
 			case 'firstCol':
@@ -134,10 +115,7 @@ Table.CellProperties=class CellProperties extends Style.Properties{
 				x.insideV && this.doc.createStyle(parentStyleId+".*!firstCol").set("border-left",this._border(x.insideV))
 			break
 			default:
-				x.top && this.set("border-top", this._border(x.top))
-				x.bottom && this.set("border-bottom", this._border(x.bottom))
-				x.top && this.set("border-top", this._border(x.top))
-				x.bottom && this.set("border-bottom", this._border(x.bottom))
+				Object.keys(x).forEach(a=>this.set(`border-${a}`,this._border(x[a])))
 			break
 		}
 	}

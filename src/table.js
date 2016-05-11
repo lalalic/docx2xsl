@@ -1,8 +1,10 @@
 import Style from "./style/table"
 
+var uid=Date.now()
 export default class Table extends require("./any"){
 	tag="table"
 	stylable=true
+	styleId=`_table_${uid++}`
 	static StyleProperties=Style.Properties
 	
 	convertStyle(){
@@ -20,6 +22,12 @@ export default class Table extends require("./any"){
 		table.setAttribute("table-layout","fixed")
 		table.setAttribute("width","100%")
 		
-		return super.convertStyle(table)
+		let directStyle=this.wordModel.getDirectStyle()
+		
+		
+		let style=this.doc.createStyle(this.content)
+		
+		if(directStyle)
+			directStyle.parse([new this.constructor.StyleProperties(style, this)])
 	}
 }
