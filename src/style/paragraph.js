@@ -8,14 +8,14 @@ export default class Paragraph extends Style{
 			return this[category]
 		
 		switch(category){
-		case 'inline':
+		case 'inline'://rPr
 			return this[category]=new Inline.Properties(this.style)
-		case 'paragraph':
+		case 'paragraph'://pPr
 			return this[category]=new this.constructor.Properties(this.style)
-		case 'frame':
+		case 'frame'://framePr
 			this[category]=new this.constructor.Properties(this.style)
 			return this[category]=new this.constructor.FrameProperties(this.style)
-		case 'numbering':
+		case 'numbering'://numPr
 			this[category]=new this.constructor.Properties(this.style)
 			return this[category]=new Numbering.Properties(this.style)
 		}

@@ -40,6 +40,14 @@ export default class List extends require("./block"){
 		
 		this.convertStyle(this.content, this.labelContent)
 	}
+	
+	/**
+	* list label: numId.level.rPr|lvlJc, numId.abstr.level.rPr|lvlJc
+	* list content style: numId.level.pPr, numId.abstr.level.pPr, direct style, named style 
+	*/
+	converStyle(){
+		super.convertStyle(...arguments)
+	}
 
 	
 	static release(doc){
