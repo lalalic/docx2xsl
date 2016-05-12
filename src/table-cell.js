@@ -2,17 +2,13 @@ import Style from './style/table'
 
 export default class TableCell extends require("./any"){
 	tag="table-cell"
+	
 
 	get tableStyleId(){//assert this.parent is a cell
 		return this.parent.tableStyleId
 	}
-
-	get tableNamedStyleId(){
-		return this.parent.tableNamedStyleId
-	}
-
 	convertStyle(){
-		this.targetStyles=[]
+		this.targetStyles=Array.from(this.parent.targetStyles ? this.parent.targetStyles : [])
 		let directStyle=this.wordModel.getDirectStyle()
 		//direct style
 		if(directStyle)
@@ -32,13 +28,13 @@ export default class TableCell extends require("./any"){
 
 	static StyleProperties=class extends Style.CellProperties{
 		cnfStyle(x){
-			var targets=[]
+			var targets=this.parent.targetStyles
 			var styles='nwCell,neCell,swCell,seCell,firstRow,lastRow,firstCol,lastCol,band1Vert,band2Vert,band1Horz,band2Horz'.split(',')
 			for(var i=0;i<12;i++){
 				if(x.charAt(i)=='1')
-					targets.unshift(styles[i])
+					targets[i]=styles[i]
 			}
-			this.parent.targetStyles=targets
+			this.parent.targetStyles=targets.filter(a=>a)
 		}
 	}
 }

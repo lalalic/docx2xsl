@@ -35,3 +35,5 @@ www/*.js
 __*.js
 
 fop
+
+spec/temp/*.pdf
