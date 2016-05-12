@@ -6,7 +6,7 @@
 		function test(input){
 			require("docx2xsl")(input.files[0])
 				.then(xsl=>text.value=xsl.data)
-				.catch(e=>{console.log(e);text.value=e.message})
+				.catch(e=>{console.log(e);text.value=e.message;input.value=""})
 		}
 	</script>
 </head>

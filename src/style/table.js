@@ -11,14 +11,12 @@ export default class Table extends Style{
 	constructor(){
 		super(...arguments)
 		this.target=this.wordModel.getTarget()
+		if(this.target=="table")
+			this.target=""
 	}
 
 	get styleId(){
 		return this.wordModel.id+(this.target ? `.${this.target}` : "")
-	}
-
-	get PrioritiziedStyles(){//low-->high
-		return 'nwCell,neCell,swCell,seCell,firstRow,lastRow,firstCol,lastCol,band1Vert,band2Vert,band1Horz,band2Horz'.split(',').reverse()
 	}
 
 	_getPropertiesConverter(category){
@@ -29,23 +27,12 @@ export default class Table extends Style{
 		case 'table':
 			return this[category]=new this.constructor.Properties(this.style,this)
 		case 'inline'://0012
-			return this[category]=new Inline.Properties(this.doc.createStyle(this.styleId+".inline"),this)
+			return this[category]=new Inline.Properties(this.doc.createStyle(this.styleId+".*inline"),this)
 		case 'paragraph'://0012
-			return this[category]=new Paragraph.Properties(this.doc.createStyle(this.styleId+".block"),this)
+			return this[category]=new Paragraph.Properties(this.doc.createStyle(this.styleId+".*block"),this)
 		case 'cell'://0011
-			return this[category]=new this.constructor.CellProperties(this.doc.createStyle(this.styleId+".table-cell", this.styleId+".*table-cell"),this)
+			return this[category]=new this.constructor.CellProperties(this.doc.createStyle(this.styleId+".*cell"),this)
 		}
-	}
-
-	getTableSelector(){
-		return '.'+Style.asCssID(this.wordModel.id)+'>tbody'
-	}
-
-	getPrioritizedSelector(){
-		var selector=this.target
-		for(var level=this.PrioritiziedStyles.indexOf(this.target),i=0;i<level;i++)
-			selector=selector+'[x'+i+']';
-		return selector
 	}
 }
 
@@ -126,5 +113,3 @@ Table.CellProperties=class CellProperties extends Style.Properties{
 		this.parent.content.setAttribute('cols-pan',x)
 	}
 }
-
-Table.TableStyles='firstRow,lastRow,firstCol,lastCol,band1Vert,band2Vert,band1Horz,band2Horz,neCell,nwCell,seCell,swCell'.split(',')

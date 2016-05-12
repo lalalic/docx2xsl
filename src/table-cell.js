@@ -11,64 +11,24 @@ export default class TableCell extends require("./any"){
 		return this.parent.tableNamedStyleId
 	}
 
-	getParentStyleIdOf(styleId){
-		
-	}
-
 	convertStyle(){
 		this.targetStyles=[]
-
 		let directStyle=this.wordModel.getDirectStyle()
-
-		let style=this.doc.createStyle(this.content)
-
 		//direct style
 		if(directStyle)
-			directStyle.parse([new this.constructor.StyleProperties(style, this)])
+			directStyle.parse([new this.constructor.StyleProperties(this.doc.createStyle(this.content), this)])
 
-		let isFirstRow=this.targetStyles.contains("firstRow") || this.wordModel.isFirstRow()
-		let isFirstCol=this.targetStyles.contains("firstCol") || this.wordModel.isFirstCol()
-		let isLastRow=this.targetStyles.contains("lastRow") || this.wordModel.isLastRow()
-		let isLastCol=this.targetStyles.contains("lastCol") || this.wordModel.isLastCol()
+		let isFirstRow=this.targetStyles.includes("firstRow") || this.wordModel.isFirstRow()
+		let isFirstCol=this.targetStyles.includes("firstCol") || this.wordModel.isFirstCol()
+		let isLastRow=this.targetStyles.includes("lastRow") || this.wordModel.isLastRow()
+		let isLastCol=this.targetStyles.includes("lastCol") || this.wordModel.isLastCol()
 
-		Object.assign(this,{isFirstRow, isFirstCol, isLastRow, isLastCol})
-		//direct table style
-		this.inheritStyle(this.tableStyleId)
-
-		let namedStyleId=this.tableNamedStyleId
-		while(namedStyleId){
-			//named table style :12 target styles
-			this.targetStyles.forEach(a=>this.inheritStyle(namedStyleId+"."+a))
-
-			//named table style: table level
-			this.inheritStyle(namedStyleId)
-
-			namedStyleId=this.getParentStyleIdOf(namedStyleId)
-		}
-		return style
+		Object.assign(this.content,{isFirstRow, isFirstCol, isLastRow, isLastCol})
+		
+		return this.doc.createStyle(this.content, this.tableStyleId, this.targetStyles)
 	}
-
-	inheritStyle(styleId){
-		if(!styleId) return
-		//direct table style
-		this.doc.createStyle(this.content, styleId+".*cell")
-
-		if(this.isFirstRow)
-			this.doc.createStyle(this.content, styleId+".*firstRow")
-		else
-			this.doc.createStyle(this.content, styleId+".*!firstRow")
-
-		if(this.isFirstCol
-			this.doc.createStyle(this.content, styleId+".*firstCol")
-		else
-			this.doc.createStyle(this.content, styleId+".*!firstCol")
-
-		if(this.isLastRow
-			this.doc.createStyle(this.content, styleId+".*lastRow")
-
-		if(this.isLastCol
-			this.doc.createStyle(this.content, styleId+".*lastCol")
-	}
+	
+	static inheritStyle=inheritStyle
 
 	static StyleProperties=class extends Style.CellProperties{
 		cnfStyle(x){
@@ -81,4 +41,28 @@ export default class TableCell extends require("./any"){
 			this.parent.targetStyles=targets
 		}
 	}
+}
+
+function inheritStyle(styleId, cell, doc, targetStyles=[]){
+	if(!styleId) return
+	
+	targetStyles.forEach(a=>inheritStyle(styleId+"."+a, cell, doc))
+	
+	if(cell.isFirstRow)
+		doc.createStyle(cell, styleId+".*firstRow")
+	else
+		doc.createStyle(cell, styleId+".*!firstRow")
+
+	if(cell.isFirstCol)
+		doc.createStyle(cell, styleId+".*firstCol")
+	else
+		doc.createStyle(cell, styleId+".*!firstCol")
+
+	if(cell.isLastRow)
+		doc.createStyle(cell, styleId+".*lastRow")
+
+	if(cell.isLastCol)
+		doc.createStyle(cell, styleId+".*lastCol")
+	
+	doc.createStyle(cell, styleId+".*cell")
 }
