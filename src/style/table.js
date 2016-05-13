@@ -34,6 +34,8 @@ export default class Table extends Style{
 			return this[category]=new this.constructor.CellProperties(this.doc.createStyle(this.styleId+".*cell"),this)
 		}
 	}
+	
+	static OrderedTargetStyles="band1Vert,band2Vert,band1Horz,band2Horz,firstRow,lastRow,firstCol,lastCol,nwCell,neCell,swCell,seCell".split(",")
 }
 
 Table.Properties=class Properties extends Style.Properties{
@@ -102,7 +104,10 @@ Table.CellProperties=class CellProperties extends Style.Properties{
 				x.insideV && this.doc.createStyle(parentStyleId+".*!firstCol").set("border-left",this._border(x.insideV))
 			break
 			default:
-				Object.keys(x).forEach(a=>this.set(`border-${a}`,this._border(x[a])))
+				x.top && this.set("border-top", this._border(x.top))
+				x.bottom && this.set("border-bottom", this._border(x.bottom))
+				x.right && this.set("border-right", this._border(x.right))
+				x.left && this.set("border-left", this._border(x.left))
 			break
 		}
 	}

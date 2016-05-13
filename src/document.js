@@ -28,8 +28,6 @@ export default class Document extends require("./any"){
 					return el
 				}
 
-				//console.log(`creating style ${id}${pid ? ` with parent ${pid}` : ""}`)
-
 				if(id=='*')
 					return this.root
 				
@@ -52,6 +50,7 @@ export default class Document extends require("./any"){
             applyStyleOn(el,styleId){
                 let style=wrappers.get(styleId)
                 while(style){
+					console.log(`applying style ${style.sid}`)
 					Array.from(style.attributes).forEach(a=>{
 						let {name,value}=a
 						if(!el.hasAttribute(name)){

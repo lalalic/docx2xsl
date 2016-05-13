@@ -21,19 +21,15 @@ export default class TableCell extends require("./any"){
 
 		Object.assign(this.content,{isFirstRow, isFirstCol, isLastRow, isLastCol})
 		
-		return this.doc.createStyle(this.content, this.tableStyleId, this.targetStyles)
+		return this.doc.createStyle(this.content, this.tableStyleId, this.targetStyles.reverse())
 	}
 	
 	static inheritStyle=inheritStyle
 
 	static StyleProperties=class extends Style.CellProperties{
-		cnfStyle(x){
+		cnfStyle(x){						
 			var targets=this.parent.targetStyles
-			var styles='nwCell,neCell,swCell,seCell,firstRow,lastRow,firstCol,lastCol,band1Vert,band2Vert,band1Horz,band2Horz'.split(',')
-			for(var i=0;i<12;i++){
-				if(x.charAt(i)=='1')
-					targets[i]=styles[i]
-			}
+			x.forEach(a=>targets[Style.OrderedTargetStyles.indexOf(a)]=a)
 			this.parent.targetStyles=targets.filter(a=>a)
 		}
 	}

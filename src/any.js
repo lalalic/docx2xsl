@@ -15,6 +15,11 @@ export default class Any{
 			return this.convert(...arguments)
 	}
 	convert(){
+		if(this._shouldIgnore()){
+			this.content=this.parent && this.parent.content || null
+			return 
+		}
+			
         this.content=this.createElement()
 		if(this.content){
 			this.parent.content.appendChild(this.content)

@@ -6,6 +6,6 @@ export default class Inline extends require("./any"){
 	static StyleProperties=Style.Properties
 	
 	_shouldIgnore(){
-		return this.wordModel.isWebHidden() || this.wordModel.isHidden()
+		return this.wordModel.isWebHidden() || this.wordModel.isHidden() || this.parent.content.tagName=='table-row'
 	}
 }
